@@ -42,7 +42,8 @@ public class EgyptianPyramidsAppExample {
     initializePharaoh(pharaohJSONArray);
 
     // read pyramids
-    String pyramidFile = "/Users/jerom/Documents/GitHub/class-java/egyptian-pyramids/demo/src/main/java/com/egyptian/pyramid.json";
+    String pyramidFile = "C:\\Users\\maria\\Documents\\GitHub\\NassefAssignment\\n" + //
+        "assaf-assignment\\demo\\src\\main\\java\\com\\example\\pyramid.json";
     JSONArray pyramidJSONArray = JSONFile.readArray(pyramidFile);
 
     // create and initialize the pyramid array

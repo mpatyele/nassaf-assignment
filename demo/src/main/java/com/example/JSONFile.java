@@ -1,4 +1,4 @@
-package com.egyptianExample;
+package com.example;
 
 import java.io.*;
 import org.json.simple.*;
