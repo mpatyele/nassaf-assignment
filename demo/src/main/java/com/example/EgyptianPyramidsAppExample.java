@@ -9,6 +9,9 @@ public class EgyptianPyramidsAppExample {
   // other structures or additional structures can be used
   protected Pharaoh[] pharaohArray;
   protected Pyramid[] pyramidArray;
+  protected HashMap<String, String> hieroglyphicToPharaoh;
+  protected HashMap<String, Integer> goldByName;
+  protected Set<Integer> requestedPyramids = new HashSet<>();
 
   public static void main(String[] args) {
     // create and start the app
@@ -39,7 +42,20 @@ public class EgyptianPyramidsAppExample {
     JSONArray pharaohJSONArray = JSONFile.readArray(pharaohFile);
 
     // create and intialize the pharaoh array
+
     initializePharaoh(pharaohJSONArray);
+
+    // populate the hashmap
+    hieroglyphicToPharaoh = new HashMap<>();
+    for (Pharaoh pharaoh : pharaohArray) {
+      hieroglyphicToPharaoh.put(pharaoh.hieroglyphic, pharaoh.name);
+    }
+
+    // populate the hashmap
+    goldByName = new HashMap<>();
+    for (Pharaoh pharaoh : pharaohArray) {
+      goldByName.put(pharaoh.hieroglyphic, pharaoh.contribution);
+    }
 
     // read pyramids
     String pyramidFile = "C:\\Users\\maria\\Documents\\GitHub\\NassefAssignment\\n" + //
@@ -112,7 +128,7 @@ public class EgyptianPyramidsAppExample {
   private static Character menuGetCommand(Scanner scan) {
     Character command = '_';
 
-    String rawInput = scan.nextLine();
+    String rawInput = scan.nextLine().trim();
 
     if (rawInput.length() > 0) {
       rawInput = rawInput.toLowerCase();
@@ -131,12 +147,121 @@ public class EgyptianPyramidsAppExample {
     }
   }
 
+  // print all pyramids
+  private void printAllPyramid() {
+    for (Pyramid pyramid : pyramidArray)  {
+      printMenuLine();
+      pyramid.print(hieroglyphicToPharaoh, goldByName);
+      printMenuLine();
+    }
+}
+
+  // get the ID from the User to select the Pharaoh
+  private static Integer getPharaohID(Scanner scan) {
+    while (true) {
+      try {
+        System.out.print("Enter the Pharaoh ID: ");
+        int pharaohID = scan.nextInt();
+        scan.nextLine();
+        return pharaohID;
+      } catch (InputMismatchException e) {
+        System.out.println("Invalid input. Please enter a valid integer.");
+        scan.nextLine(); // Clear the invalid input from the scanner
+      }
+    }
+  }
+
+  // Show the requested Pharaoh
+  private void displayPharaoh(int pharaohID) {
+    boolean found = false;
+    for (Pharaoh pharaoh : pharaohArray) {
+      if (pharaoh.id == pharaohID) {
+        printMenuLine();
+        pharaoh.print();
+        printMenuLine();
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      System.out.println();
+      System.out.println("Pharaoh with ID " + pharaohID + " not found.");
+    }
+  }
+
+  // get the ID from the User to select the Pyramid
+  private static Integer getPyramidID(Scanner scan, Set<Integer> requestedPyramids) {
+    while (true) {
+      try {
+        System.out.print("Enter the Pyramid ID: ");
+        int pyramidID = scan.nextInt();
+        scan.nextLine();
+        requestedPyramids.add(pyramidID);
+        return pyramidID;
+      } catch (InputMismatchException e) {
+        System.out.println("Invalid input. Please enter a valid integer.");
+        scan.nextLine(); // Clear the invalid input from the scanner
+      }
+    }
+  }
+
+  // Show the requested Pyramid
+  private void displayPyramid(int pyramidID) {
+    boolean found = false;
+    for (Pyramid pyramid : pyramidArray) {
+      if (pyramid.id == pyramidID) {
+        printMenuLine();
+        pyramid.print(hieroglyphicToPharaoh, goldByName);
+        printMenuLine();
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      System.out.println();
+      System.out.println("Pyramid with ID " + pyramidID + " not found.");
+    }
+  }
+
+  private void displayRequestedPyramids() {
+    System.out.println("List of requested pyramid: ");
+    System.out.printf("ID\t\tName\n");
+    System.out.printf("-------\t\t---------------------------------------\n");
+    for (int pyramidID : requestedPyramids) {
+      for (Pyramid pyramid : pyramidArray) {
+        if (pyramid.id == pyramidID) {
+          printRequestedPyramids(pyramid.id, pyramid.name);
+          break;
+        }
+      }
+    }
+  }
+
+  // Method to print the previously requested Pyramids
+  private static void printRequestedPyramids(Integer id, String name) {
+    System.out.printf("%s\t\t%s\n", id, name);
+  }
+
   private Boolean executeCommand(Scanner scan, Character command) {
     Boolean success = true;
 
     switch (command) {
       case '1':
         printAllPharaoh();
+        break;
+      case '2':
+        int pharaohID = getPharaohID(scan);
+        displayPharaoh(pharaohID);
+        break;
+      case '3':
+        printAllPyramid();
+        break;
+      case '4':
+        int pyramidID = getPyramidID(scan, requestedPyramids);
+        displayPyramid(pyramidID);
+        break;
+      case '5':
+        displayRequestedPyramids();
         break;
       case 'q':
         System.out.println("Thank you for using Nassef's Egyptian Pyramid App!");
@@ -166,6 +291,10 @@ public class EgyptianPyramidsAppExample {
     System.out.printf("Command\t\tDescription\n");
     System.out.printf("-------\t\t---------------------------------------\n");
     printMenuCommand('1', "List all the pharoahs");
+    printMenuCommand('2', "Displays a specific Egyptian pharaoh");
+    printMenuCommand('3', "List all the pyramids");
+    printMenuCommand('4', "Displays a specific pyramid");
+    printMenuCommand('5', "Displays a list of requested pyramid");
     printMenuCommand('q', "Quit");
     printMenuLine();
   }
